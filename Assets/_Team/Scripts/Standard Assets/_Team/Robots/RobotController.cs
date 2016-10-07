@@ -6,7 +6,7 @@ using Rewired;
 public class RobotController : MonoBehaviour {
 
     // Rewired input
-    public int playerId = 1;
+    public int RewiredPlayerId = 1;
     private Player player;
 
     [Space(20)]
@@ -29,22 +29,41 @@ public class RobotController : MonoBehaviour {
     // Input
     private List<int> listButtonPressed;
 
+    [Space(20)]
+
+    // Life value
+    public float Life;
+
+    // Life text
+    public TextMesh LifeText;
+
+    [Space(20)]
+
+    // OnDie instantiate this prefab
+    public GameObject OnDie_ExplosionPrefab;
+
 
 
     void Awake() {
-		player = ReInput.players.GetPlayer(int.Parse(transform.root.name.Replace("Machine ", "")));
-		rigidBody = GetComponent<Rigidbody>();
+        // Get Rewired input
+        player = ReInput.players.GetPlayer(RewiredPlayerId);
+
+        // Get RigidBody
+        rigidBody = GetComponent<Rigidbody>();
+
+        // Instantiate list of inputs 
         listButtonPressed = new List<int>();
+
+        if(LifeText != null) {
+            LifeText.text = Life + "";
+        } else {
+            LifeText = new TextMesh();
+        }
     }
+
 
     void Update() {
         Move();
-
-
-
-        if(player.GetButtonDown("Start")) {
-            Application.LoadLevel(0);
-        }
     }
 
     void FixedUpdate() {
@@ -52,7 +71,35 @@ public class RobotController : MonoBehaviour {
     }
 
 
+    void OnTriggerEnter(Collider coll) {
+        if(coll.CompareTag("Bullet")) {
+            OnHittedEvent(coll);
+        }
+    }
 
+
+    #region Life Events
+    void OnHittedEvent(Collider coll) {
+        // Remove amount of life
+        Life -= coll.GetComponent<BulletFire>().Damage;
+        LifeText.text = Life.ToString();
+
+        // Check if life < 0 then Die;
+        if(Life <= 0) {
+            OnDie();
+        }
+    }
+
+    void OnDie() {
+        if(OnDie_ExplosionPrefab != null) {
+            Instantiate(OnDie_ExplosionPrefab, transform.position, transform.rotation);
+        }
+        transform.root.gameObject.SetActive(false);
+    }
+
+    #endregion
+
+    #region Move Pods : Update / FixedUpdate
     // Move pods
     void Move() {
         float joyX = player.GetAxis("Move X");
@@ -86,6 +133,7 @@ public class RobotController : MonoBehaviour {
             listButtonPressed.Add(3);
         }
     }
+
     void MoveFixed() {
         foreach(int i in listButtonPressed) {
             podsRigidbody[i].AddForce(0, intensityY, 0);
@@ -99,6 +147,6 @@ public class RobotController : MonoBehaviour {
             Debug.DrawLine(g.transform.position, transform.position, Color.red);
         }
     }
-
+    #endregion
 
 }
