@@ -3,7 +3,6 @@ using System.Collections;
 
 public class RobotLifeManager : MonoBehaviour {
 
-	private Vector3 startPosition;
 
 	public float Life;
 	public TextMesh LifeText;
@@ -14,7 +13,6 @@ public class RobotLifeManager : MonoBehaviour {
 
 
 	void Start () {
-		startPosition = transform.position;
 		LifeText.text = Life + "";
 	}
 

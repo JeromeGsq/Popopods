@@ -3,11 +3,19 @@ using System.Collections;
 using Rewired;
 
 public class ShieldController : MonoBehaviour {
-	public int playerId = 0;
+    private RobotController RobotController;
+
 	private Player player;
 
 	void Awake() {
-		player = ReInput.players.GetPlayer(int.Parse(transform.root.name.Replace("Machine ", "")));
+        RobotController = transform.root.GetComponentInChildren<RobotController>();
+        if(RobotController == null) {
+            Debug.LogError("Impossible de trouver RobotController ! GameObject désactivé");
+            gameObject.SetActive(false);
+            return;
+        }
+
+        player = ReInput.players.GetPlayer(RobotController.RewiredPlayerId);
 	}
 
 	void Update () {
@@ -20,7 +28,6 @@ public class ShieldController : MonoBehaviour {
 
 	void OnTriggerEnter(Collider coll) {
 		if (coll.CompareTag("Bullet")) {
-			Debug.Log("Bloqué");
 			coll.GetComponent<BulletFire>().DestroyThis();
 		}
 	}

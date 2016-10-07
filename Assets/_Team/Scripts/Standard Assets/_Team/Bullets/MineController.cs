@@ -34,7 +34,7 @@ public class MineController :  MonoBehaviour {
 	}
 
 	void OnTriggerEnter(Collider coll) {
-		if (coll.CompareTag("Machine") && coll.transform.root.GetComponentInChildren<RobotController>().playerId != player) {
+		if (coll.CompareTag("Machine") && coll.transform.root.GetComponentInChildren<RobotController>().RewiredPlayerId != player) {
 			coll.transform.root.GetComponentInChildren<RobotLifeManager>().Life -= Damage;
 			Explosion();
 		}
